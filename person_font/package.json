@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -13,12 +13,7 @@
     "vue": "^3.4.31"
   },
   "devDependencies": {
-    "@vant/auto-import-resolver": "^1.2.1",
     "@vitejs/plugin-vue": "^5.0.5",
-    "typescript": "^5.2.2",
-    "unplugin-auto-import": "^0.18.2",
-    "unplugin-vue-components": "^0.27.3",
-    "vite": "^5.3.4",
-    "vue-tsc": "^2.0.24"
+    "vite": "^5.3.4"
   }
 }
