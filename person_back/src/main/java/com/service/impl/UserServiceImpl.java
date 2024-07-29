@@ -4,18 +4,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.common.ErrorCode;
 import com.exception.BusinessException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mapper.UserMapper;
 import com.model.User;
 import com.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.contant.UserConstant.USER_LOGIN_STATE;
 
@@ -173,6 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserRole(orginUser.getUserRole());
         safetyUser.setUserStatus(orginUser.getUserStatus());
         safetyUser.setCreateTime(orginUser.getCreateTime());
+        safetyUser.setTags(orginUser.getTags());
         return safetyUser;
 
     }
@@ -188,6 +195,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         throw new BusinessException(ErrorCode.PARAMS_ERROR);
+    }
+
+    /**
+     * 根据标签搜索用户
+     *
+     * @param tagNameList
+     * @return
+     */
+
+    @Override
+    public List<User> searchUserByTags(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //第一种方法
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        for (String tagName : tagNameList) {
+//            //模糊查询   拼接and查询
+//            // tags like '%java%' and tags like '%python%'
+//            queryWrapper = queryWrapper.like("tags", tagName);
+//        }
+//        List<User> userList = userMapper.selectList(queryWrapper);
+//        userList.forEach(user->{
+//            getSafetyUser(user);
+//        });
+        //1.获取所有用户
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        List<User> userList = userMapper.selectList(queryWrapper);
+        Gson gson = new Gson();
+        //2.在内存中判断是否有符合要求的标签
+        return userList.stream().filter(user -> {
+            String tagsStr = user.getTags();
+            if (StringUtils.isBlank(tagsStr)){
+                return false;
+            }
+            // 使用Gson从字符串中反序列化出用户列表
+            Set<String> tempTagSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>() {
+            }.getType());
+            for (String tagName : tempTagSet) {
+                if (!tempTagSet.contains(tagName)) {
+                    return false;
+                }
+            }
+            return true;
+        }).map(this::getSafetyUser).collect(Collectors.toList());
+//        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 }
 

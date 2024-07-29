@@ -8,10 +8,14 @@
       <van-icon name="search" size="18"/>
     </template>
   </van-nav-bar>
-  <slot name="content">
-    <div>这里写内容</div>
-
-  </slot>
+  <div id="content">
+    <template v-if="active==='index'">
+      <Index/>
+    </template>
+    <template v-if="active==='team'">
+      <Team/>
+    </template>
+  </div>
   <van-tabbar v-model="active" @change="onChange">
     <van-tabbar-item icon="home-o" name="index">主页</van-tabbar-item>
     <van-tabbar-item icon="search" name="team">组队</van-tabbar-item>
@@ -22,6 +26,9 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import {showToast} from 'vant';
+import Index from "../pages/Index.vue";
+import Team from "../pages/Team.vue";
+
 
 const onClickLeft = () => alert('左')
 const onClickRight = () => alert('右')
