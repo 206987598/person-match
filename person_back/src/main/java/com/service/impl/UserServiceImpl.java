@@ -17,7 +17,9 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -198,7 +200,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     /**
-     * 根据标签搜索用户
+     * 根据标签搜索用户（内存过滤）
      *
      * @param tagNameList
      * @return
@@ -209,17 +211,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (CollectionUtils.isEmpty(tagNameList)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        //第一种方法
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-//        for (String tagName : tagNameList) {
-//            //模糊查询   拼接and查询
-//            // tags like '%java%' and tags like '%python%'
-//            queryWrapper = queryWrapper.like("tags", tagName);
-//        }
-//        List<User> userList = userMapper.selectList(queryWrapper);
-//        userList.forEach(user->{
-//            getSafetyUser(user);
-//        });
         //1.获取所有用户
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         List<User> userList = userMapper.selectList(queryWrapper);
@@ -227,13 +218,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //2.在内存中判断是否有符合要求的标签
         return userList.stream().filter(user -> {
             String tagsStr = user.getTags();
-            if (StringUtils.isBlank(tagsStr)){
+            if (StringUtils.isBlank(tagsStr)) {
                 return false;
             }
             // 使用Gson从字符串中反序列化出用户列表
             Set<String> tempTagSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>() {
             }.getType());
-            for (String tagName : tempTagSet) {
+            tempTagSet = Optional.ofNullable(tempTagSet).orElse(new HashSet<>());
+            for (String tagName : tagNameList) {
                 if (!tempTagSet.contains(tagName)) {
                     return false;
                 }
@@ -241,6 +233,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return true;
         }).map(this::getSafetyUser).collect(Collectors.toList());
 //        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据标签搜索用户 (通过SQL实现)
+     *
+     * @param tagNameList
+     * @return
+     */
+
+    @Deprecated
+    private List<User> searchUserByTagsBySQL(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        for (String tagName : tagNameList) {
+            //模糊查询   拼接and查询
+            // tags like '%java%' and tags like '%python%'
+            queryWrapper = queryWrapper.like("tags", tagName);
+        }
+        List<User> userList = userMapper.selectList(queryWrapper);
+        userList.forEach(user -> {
+            getSafetyUser(user);
+        });
+        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 }
 

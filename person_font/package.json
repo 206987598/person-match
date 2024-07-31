@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "vant": "^4.9.3",
-    "vue": "^3.4.31"
+    "vue": "^3.4.31",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@vant/auto-import-resolver": "^1.2.1",
