@@ -11,22 +11,28 @@
   <div id="content">
     <router-view/>
   </div>
-<!--  <router-link to="/">主页</router-link>-->
-<!--  <router-link to="/team">队伍</router-link>-->
+  <!--  <router-link to="/">主页</router-link>-->
+  <!--  <router-link to="/team">队伍</router-link>-->
   <van-tabbar route>
-    <van-tabbar-item to="/" icon="home-o" >主页</van-tabbar-item>
-    <van-tabbar-item to="/team" icon="search" >组队</van-tabbar-item>
-    <van-tabbar-item  to="/user"  icon="friends-o" >个人</van-tabbar-item>
+    <van-tabbar-item to="/" icon="home-o">主页</van-tabbar-item>
+    <van-tabbar-item to="/team" icon="search">组队</van-tabbar-item>
+    <van-tabbar-item to="/user" icon="friends-o">个人</van-tabbar-item>
   </van-tabbar>
 
 </template>
+
 <script setup lang="ts">
 // import {ref} from 'vue';
 // import {showToast} from 'vant';
+import {useRouter} from 'vue-router'
 
-
-const onClickLeft = () => alert('左')
-const onClickRight = () => alert('右')
+const router = useRouter()
+const onClickLeft = () => {
+  router.push(('/'))
+}
+const onClickRight = () => {
+  router.push(('/search'))
+}
 // const active = ref("index");
 // const onChange = (index) => showToast(`标签 ${index}`);
 </script>
