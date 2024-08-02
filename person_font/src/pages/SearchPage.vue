@@ -67,13 +67,24 @@ const originTagList = [
 ];
 //定义响应式标签列表
 const tagList = ref(originTagList)
+
+/**
+ * 根据搜索值过滤标签列表
+ * @param {string} val - 搜索框的值
+ */
 const onSearch = (val) => {
+  // 遍历原始标签列表，对每个标签及其子标签进行筛选
   tagList.value = originTagList.map(parentTag => {
+    // 复制父标签，以免修改原始数据
     const temParent = {...parentTag}
+    // 复制子标签列表，以便进行筛选
     const temChildren = [...parentTag.children]
+    // 筛选子标签，只保留文本中包含搜索值的标签
     temParent.children = temChildren.filter(item => item.text.includes(SearchText.value))
+    // 返回修改后的父标签
     return temParent;
   })
+
   // tagList.forEach(parentTag => parentTag.children=parentTag.children.filter(item => item.text.includes(SearchText.value)))
   // activeIds.value = tagList.flatMap(parent => parent.children)
   //     .filter(item => item.text.includes(SearchText.value));

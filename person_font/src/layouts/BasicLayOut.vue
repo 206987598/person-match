@@ -28,7 +28,8 @@ import {useRouter} from 'vue-router'
 
 const router = useRouter()
 const onClickLeft = () => {
-  router.push(('/'))
+  router.back()
+  // router.push(('/'))
 }
 const onClickRight = () => {
   router.push(('/search'))
