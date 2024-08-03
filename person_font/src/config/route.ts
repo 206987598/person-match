@@ -3,6 +3,7 @@ import SearchPage from "../pages/SearchPage.vue";
 import UserPage from "../pages/UserPage.vue";
 import TeamPage from "../pages/TeamPage.vue";
 import UserEdit from "../pages/UserEdit.vue";
+import SearchResultPage from "../pages/SearchResultPage.vue";
 
 
 
@@ -12,5 +13,6 @@ const routes = [
     {path: '/user', component: UserPage},
     {path: '/search', component: SearchPage },
     {path: '/user/edit', component: UserEdit },
+    {path: '/user/list', component: SearchResultPage },
 ]
 export default routes;
