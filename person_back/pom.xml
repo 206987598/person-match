@@ -70,11 +70,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-autoconfigure</artifactId>
-            <version>3.0.2</version>
-        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
