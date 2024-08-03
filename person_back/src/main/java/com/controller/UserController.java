@@ -145,7 +145,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/search/tags")
-    public BaseResponse<List<User>> searchUserByTags(List<String> tagNameList) {
+    public BaseResponse<List<User>> searchUserByTags(@RequestParam List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)){
             throw new  BusinessException(ErrorCode.NULL_ERROR);
         }

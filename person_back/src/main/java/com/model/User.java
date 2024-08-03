@@ -91,6 +91,10 @@ public class User implements Serializable {
      * JSON标签
      */
     private String tags;
+    /**
+     * 个人简介
+     */
+    private String profile;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
