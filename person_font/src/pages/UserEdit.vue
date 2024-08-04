@@ -17,20 +17,31 @@
 
 </template>
 <script setup lang="ts">
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {ref} from "vue";
+import MyAxios from "../plugins/myAxios";
 
 const route = useRoute()
-const editUser=ref(
+const editUser = ref(
     {
-      editKey:route.query.editKey,
-      editName:route.query.editName,
-      currentValue:route.query.currentValue
+      editKey: route.query.editKey,
+      editName: route.query.editName,
+      currentValue: route.query.currentValue
     }
 )
-const onSubmit = (values: any) => {
-  //todo 把editKey，editName，currentValue传给后端
-  console.log('submit', values);
+const router = useRouter()
+const onSubmit = async () => {
+  const res = await MyAxios.post('user/update', {
+    'id': 1,
+    [editUser.value.editKey as string]: editUser.value.currentValue
+  })
+  console.log("更新请求")
+  if (res.code === 0 && res.data > 0) {
+    alert('修改成功')
+    router.back()
+  } else {
+    alert('修改失败')
+  }
 };
 </script>
 <style scoped>
