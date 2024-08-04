@@ -29,7 +29,7 @@ import static com.contant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173/"},allowCredentials = "true")
 public class UserController {
     @Resource
     private UserService userService;
@@ -122,20 +122,28 @@ public class UserController {
 
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUser(String username, HttpServletRequest request) {
-        //仅管理员可查询
-        if (!isAdmin(request)) {
+        // 仅允许管理员查询用户列表，确保权限安全
+        if (!userService.isAdmin(request)) {
             return null;
         }
+        // 构建查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 如果用户名不为空，则添加模糊查询条件
         if (StringUtils.isNotBlank(username)) {
             queryWrapper.like("username", username);
         }
+        // 执行查询，获取用户列表
         List<User> userList = userService.list(queryWrapper);
+        // 处理用户列表，移除敏感信息
         List<User> list = userList.stream().map(user -> {
+            // 清空用户密码
             user.setUserPassword(null);
+            // 返回安全的用户信息
             return userService.getSafetyUser(user);
         }).collect(Collectors.toList());
+        // 返回查询结果
         return ResultUtils.success(list);
+
     }
 
     /**
@@ -146,11 +154,15 @@ public class UserController {
      */
     @GetMapping("/search/tags")
     public BaseResponse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList) {
+        // 检查标签列表是否为空，如果为空则抛出业务异常
         if (CollectionUtils.isEmpty(tagNameList)) {
             throw new BusinessException(ErrorCode.NULL_ERROR);
         }
+        // 根据标签列表搜索用户
         List<User> userList = userService.searchUserByTags(tagNameList);
+        // 返回搜索到的用户列表
         return ResultUtils.success(userList);
+
     }
 
     /**
@@ -162,7 +174,7 @@ public class UserController {
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody Long id, HttpServletRequest request) {
         //仅管理员可删除
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             return null;
         }
         if (id <= 0) {
@@ -174,18 +186,30 @@ public class UserController {
     }
 
     /**
-     * 判断是否为管理员
+     * 更新用户
      *
+     * @param user
      * @param request
      * @return
      */
-    public boolean isAdmin(HttpServletRequest request) {
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        if (user == null || user.getUserRole() != ADMIN_ROLE) {
-            return false;
+    @PostMapping("/update")
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
+        // 检查用户对象是否为空
+        if (user == null) {
+            // 如果用户对象为空，则抛出空值异常
+            throw new BusinessException(ErrorCode.NULL_ERROR);
         }
-        return true;
+        // 从请求中获取当前登录的用户
+        User loginUser = userService.getLoginUser(request);
+        // 检查获取的登录用户是否为空
+        if (loginUser == null) {
+            // 如果登录用户为空，则抛出未登录异常
+            throw new BusinessException(ErrorCode.NO_LOGIN);
+        }
+        // 更新用户信息，将传入的用户对象信息更新到数据库中，loginUser用于权限检查
+        int result = userService.updateUser(user, loginUser);
+        // 返回更新成功的提示信息
+        return ResultUtils.success(result);
     }
 
 

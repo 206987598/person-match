@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.contant.UserConstant.ADMIN_ROLE;
 import static com.contant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -233,6 +234,95 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return true;
         }).map(this::getSafetyUser).collect(Collectors.toList());
 //        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询当前登录用户
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        // 检查请求对象是否为空，为空则抛出参数错误异常
+        if (request == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 从会话中获取用户对象，如果为空则抛出未登录异常
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null) {
+            throw new BusinessException(ErrorCode.NO_LOGIN);
+        }
+        // 将用户对象转换为User类型并返回
+        return (User) userObj;
+
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param user
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public int updateUser(User user, User loginUser) {
+        // 检查用户ID是否为空，为空则抛出参数错误异常
+        long userId = user.getId();
+        if (userId <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //判断是否为管理员或者是否为本人
+        if (!isAdmin(loginUser) && userId != loginUser.getId()) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        //查询用户
+        User oldUser = userMapper.selectById(user);
+        if (oldUser == null) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        // 更新用户信息，返回更新结果
+        return userMapper.updateById(user);
+
+    }
+
+    /**
+     * 判断是否为管理员
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        // 从会话中获取用户对象，该对象代表当前登录的用户状态
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        // 将获取的用户对象转换为User类型，以便进行进一步的验证
+        User user = (User) userObj;
+        // 检查用户对象是否存在，以及用户角色是否为管理员角色
+        // 这一步确保只有管理员角色的用户才能通过验证
+        if (user == null || user.getUserRole() != ADMIN_ROLE) {
+            // 如果用户对象不存在或用户角色不是管理员，返回false，表示验证不通过
+            return false;
+        }
+        // 如果用户对象存在且用户角色是管理员，返回true，表示验证通过
+        return true;
+
+    }
+
+    /**
+     * 判断当前是否为管理员
+     *
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public boolean isAdmin(User loginUser) {
+        // 检查当前登录用户是否为空或不是管理员角色
+        // 这里解释了代码的目的：判断用户是否有权限执行某些操作
+        // loginUser 参数：当前登录的用户对象
+        // ADMIN_ROLE 常量：表示管理员角色的标识
+        return loginUser == null || loginUser.getUserRole() != ADMIN_ROLE;
+
     }
 
     /**
