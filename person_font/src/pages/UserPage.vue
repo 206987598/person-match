@@ -19,7 +19,8 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import MyAxios from "../plugins/myAxios";
+import {getCurrentUser} from "../service/User.ts";
+
 
 // const user = {
 //   id: 1,
@@ -32,17 +33,24 @@ import MyAxios from "../plugins/myAxios";
 //   createTime: new Date(),
 //   planetCode: 16533,
 // }
+// 定义一个响应式引用，用于存储当前用户信息
 const user = ref()
+/**
+ * 在组件挂载后执行异步操作，获取当前用户信息
+ * 使用async/await语法以处理异步获取的用户信息
+ */
 onMounted(async () => {
-  const res = await MyAxios.get('/user/current');
-  if (res.code === 0) {
-    user.value = res.data,
-        alert("获取用户信息成功")
-  } else {
-    alert("获取用户信息失败")
-  }
+  user.value = await getCurrentUser()
 })
+// 获取路由实例，用于后续的路由跳转
 const Router = useRouter()
+/**
+ * 编辑用户信息的函数
+ * @param {string} editKey - 需要编辑的用户信息的键值
+ * @param {string} editName - 需要编辑的用户信息的名称
+ * @param {string} currentValue - 当前编辑字段的值
+ * 路由跳转到编辑页面，并传递编辑信息作为查询参数
+ */
 const doEdit = (editKey: string, editName: string, currentValue: string) => {
   Router.push({
     path: '/user/edit',
@@ -53,6 +61,7 @@ const doEdit = (editKey: string, editName: string, currentValue: string) => {
     }
   })
 }
+
 </script>
 <style scoped>
 
