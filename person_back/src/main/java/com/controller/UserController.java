@@ -10,13 +10,17 @@ import com.model.User;
 import com.model.request.UserLoginRequest;
 import com.model.request.UserRegisterRequest;
 import com.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import static com.contant.UserConstant.USER_LOGIN_STATE;
 
@@ -29,9 +33,12 @@ import static com.contant.UserConstant.USER_LOGIN_STATE;
 @RestController
 @RequestMapping("/user")
 @CrossOrigin(origins = {"http://localhost:5173/"}, allowCredentials = "true")
+@Slf4j
 public class UserController {
     @Resource
     private UserService userService;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     /**
      * 用户注册
@@ -147,12 +154,29 @@ public class UserController {
 
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+        // 获取当前登录用户
+        User currentUser = userService.getLoginUser(request);
+        //查缓存，如果有缓存直接取缓存
+        //构造redisKey
+        String redisKey = String.format("lack:user:recommend:%s", currentUser.getId());
+        ValueOperations operations = redisTemplate.opsForValue();
+        Page<User> userPage = (Page<User>) operations.get(redisKey);
+        if (userPage != null) {
+            return ResultUtils.success(userPage);
+        }
+        // 没有就直接查数据库
         // 构建查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         // 执行查询，获取用户列表
-        Page<User> userList = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+         userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+         // 缓存到redis
+        try {
+            operations.set(redisKey, userPage,1, TimeUnit.HOURS);
+        } catch (Exception e) {
+            log.error("redis set key error", e);
+        }
         // 返回查询结果
-        return ResultUtils.success(userList);
+        return ResultUtils.success(userPage);
 
     }
 
