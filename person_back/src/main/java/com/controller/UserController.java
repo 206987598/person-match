@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.common.BaseResponse;
 import com.common.ErrorCode;
 import com.common.ResultUtils;
@@ -17,8 +18,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.contant.UserConstant.ADMIN_ROLE;
 import static com.contant.UserConstant.USER_LOGIN_STATE;
 
 
@@ -29,7 +28,7 @@ import static com.contant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:5173/"},allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173/"}, allowCredentials = "true")
 public class UserController {
     @Resource
     private UserService userService;
@@ -143,6 +142,17 @@ public class UserController {
         }).collect(Collectors.toList());
         // 返回查询结果
         return ResultUtils.success(list);
+
+    }
+
+    @GetMapping("/recommend")
+    public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+        // 构建查询条件
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 执行查询，获取用户列表
+        Page<User> userList = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        // 返回查询结果
+        return ResultUtils.success(userList);
 
     }
 
