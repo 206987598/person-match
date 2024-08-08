@@ -63,6 +63,12 @@
             <artifactId>spring-session-data-redis</artifactId>
             <version>2.7.4</version>
         </dependency>
+        <!-- 引入Redisson依赖       -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.16.1</version>
+        </dependency>
 
         <dependency>
             <groupId>com.mysql</groupId>
