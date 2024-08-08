@@ -5,17 +5,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.model.User;
 import com.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Configuration
+@Component
 @Slf4j
 public class preRecommendUsers {
     @Resource
@@ -26,7 +26,7 @@ public class preRecommendUsers {
     private List<Long> mainUserList = Arrays.asList(1L);
 
     @Scheduled(cron = "0 0 1 * * ?")
-    public void preRecommendUsers() {
+    public void doPreRecommendUsers() {
         for (Long userId : mainUserList) {
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             // 执行查询，获取用户列表
