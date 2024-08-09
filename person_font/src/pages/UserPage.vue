@@ -7,9 +7,11 @@
     <van-cell title="头像" is-link to="/user/edit">
       <img :src="user.avatarUrl" width="50" height="50"/>
     </van-cell>
-    <van-cell title="性别"  is-link to="/user/edit" :value="user.gender" @click="doEdit('gender','性别',user.gender)"
+    <van-cell title="性别"  is-link to="/user/edit" :value="user.gender" @click="doEdit('gender','性别',user.gender)">
+      {{user.gender==0?'男':user.gender==1?'女':'未知'}}
+    </van-cell>
 
-    />
+
     <van-cell title="电话" is-link to="/user/edit" :value="user.phone" @click="doEdit('phone','电话',user.phone)"/>
     <van-cell title="邮箱" is-link to="/user/edit" :value="user.email" @click="doEdit('email','邮箱',user.email)"/>
     <van-cell title="星球编号" :value="user.planetCode"/>

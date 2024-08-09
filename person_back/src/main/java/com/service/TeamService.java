@@ -1,7 +1,8 @@
 package com.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.usercenter.model.Team;
+import com.model.Team;
+import com.model.User;
 
 /**
 * @author qings
@@ -9,5 +10,12 @@ import com.usercenter.model.Team;
 * @createDate 2024-08-09 14:27:56
 */
 public interface TeamService extends IService<Team> {
+    /**
+     * 添加队伍
+     * @param team
+     * @param loginUser
+     * @return
+     */
+    long addTeam(Team team, User loginUser);
 
 }

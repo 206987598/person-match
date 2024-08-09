@@ -4,12 +4,12 @@
 
 </template>
 <script setup>
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {ref, onMounted} from "vue";
 import MyAxios from "../plugins/myAxios.js";
 import UserCardList from "../components/UserCardList.vue";
 
-
+const router = useRouter()
 const route = useRoute()
 const {tags} = route.query
 const userList = ref([])

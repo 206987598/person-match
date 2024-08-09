@@ -2,8 +2,8 @@ package com.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.service.UserTeamService;
-import com.usercenter.mapper.UserTeamMapper;
-import com.usercenter.model.UserTeam;
+import com.mapper.UserTeamMapper;
+import com.model.UserTeam;
 import org.springframework.stereotype.Service;
 
 /**

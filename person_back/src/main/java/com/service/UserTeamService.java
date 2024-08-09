@@ -1,7 +1,7 @@
 package com.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.usercenter.model.UserTeam;
+import com.model.UserTeam;
 
 /**
 * @author qings
