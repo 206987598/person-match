@@ -23,7 +23,6 @@ import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {getCurrentUser} from "../service/User.ts";
 
-
 // const user = {
 //   id: 1,
 //   username: 'lack',

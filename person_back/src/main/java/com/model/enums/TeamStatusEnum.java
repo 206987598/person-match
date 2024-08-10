@@ -1,6 +1,6 @@
 package com.model.enums;
 
-public enum teamStatusEnum {
+public enum TeamStatusEnum {
     /**
      * 公开（所有人可看）
      */
@@ -14,7 +14,7 @@ public enum teamStatusEnum {
      */
     SECRET(2, "加密");
 
-   public static teamStatusEnum getTeamStatusEnumByValue(Integer value){
+   public static TeamStatusEnum getTeamStatusEnumByValue(Integer value){
        if (value==null){
            return null;
        }
@@ -26,8 +26,8 @@ public enum teamStatusEnum {
        //
        // 返回值:
        //   匹配的teamStatusEnum枚举对象，如果找不到则返回null
-       teamStatusEnum[] values = teamStatusEnum.values();
-       for (teamStatusEnum teamStatusEnum : values) {
+       TeamStatusEnum[] values = TeamStatusEnum.values();
+       for (TeamStatusEnum teamStatusEnum : values) {
            if (teamStatusEnum.value == value) {
                return teamStatusEnum;
            }
@@ -38,7 +38,7 @@ public enum teamStatusEnum {
     private int value;
     private String text;
 
-    teamStatusEnum(int value, String text) {
+    TeamStatusEnum(int value, String text) {
         this.value = value;
         this.text = text;
     }

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
-public class preRecommendJob {
+public class PreRecommendJob {
     @Resource
     private UserService userService;
     @Resource

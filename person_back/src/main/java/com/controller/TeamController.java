@@ -9,8 +9,10 @@ import com.common.ResultUtils;
 import com.exception.BusinessException;
 import com.model.Team;
 import com.model.User;
-import com.model.dto.TeamDto;
-import com.model.request.addTeamRequest;
+import com.model.dto.TeamDTO;
+import com.model.request.AddTeamRequest;
+import com.model.request.TeamUpdateRequest;
+import com.model.vo.TeamUserVO;
 import com.service.TeamService;
 import com.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +38,13 @@ public class TeamController {
 
     /**
      * 创建队伍
+     *
      * @param addTeamRequest
      * @param request
      * @return
      */
     @PostMapping("/save")
-    public BaseResponse<Long> addTeam(@RequestBody addTeamRequest addTeamRequest, HttpServletRequest request) {
+    public BaseResponse<Long> addTeam(@RequestBody AddTeamRequest addTeamRequest, HttpServletRequest request) {
         if (addTeamRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -78,11 +81,12 @@ public class TeamController {
      */
 
     @PostMapping("/update")
-    public BaseResponse<Boolean> upDateTeam(Team team) {
-        if (team == null) {
+    public BaseResponse<Boolean> upDateTeam(@RequestBody TeamUpdateRequest teamUpdateRequest, HttpServletRequest request) {
+        if (teamUpdateRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean result = teamService.updateById(team);
+        User loginUser = userService.getLoginUser(request);
+        boolean result = teamService.updateById(teamUpdateRequest, loginUser);
         if (!result) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
         }
@@ -114,18 +118,13 @@ public class TeamController {
      * @return
      */
     @GetMapping("/list")
-    public BaseResponse<List<Team>> getTeamList(TeamDto teamDto) {
+    public BaseResponse<List<TeamUserVO>> getTeamList(TeamDTO teamDto, HttpServletRequest request) {
         // 检查团队信息对象是否为空，如果为空则抛出业务异常
         if (teamDto == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        // 初始化团队实体对象，并将DTO中的属性复制到实体对象中
-        Team team = new Team();
-        BeanUtils.copyProperties(team, teamDto);
-        // 构建查询条件包装器，用于后续的查询操作
-        QueryWrapper<Team> queryWrapper = new QueryWrapper<>(team);
-        // 使用构建的查询条件查询所有匹配的团队信息
-        List<Team> teamList = teamService.list(queryWrapper);
+        boolean isAdmin = userService.isAdmin(request);
+        List<TeamUserVO> teamList = teamService.listTeams(teamDto, isAdmin);
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }
@@ -137,7 +136,7 @@ public class TeamController {
      * @return
      */
     @GetMapping("/list/page")
-    public BaseResponse<Page<Team>> getTeamPage(TeamDto teamDto) {
+    public BaseResponse<Page<Team>> getTeamPage(TeamDTO teamDto) {
         // 检查团队信息对象是否为空，如果为空则抛出业务异常
         if (teamDto == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

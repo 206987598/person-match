@@ -12,7 +12,7 @@ import java.util.Date;
  */
 
 @Data
-public class addTeamRequest implements Serializable {
+public class AddTeamRequest implements Serializable {
 
     /**
      * 队伍名称
@@ -50,6 +50,5 @@ public class addTeamRequest implements Serializable {
     private String password;
 
 
-    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
