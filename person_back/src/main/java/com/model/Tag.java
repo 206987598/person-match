@@ -12,6 +12,7 @@ import java.util.Date;
  * @TableName tag
  */
 @Data
+
 @TableName(value = "tag")
 public class Tag implements Serializable {
     /**

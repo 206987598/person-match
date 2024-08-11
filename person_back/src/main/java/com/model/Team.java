@@ -12,6 +12,7 @@ import java.util.Date;
  */
 @TableName(value ="team")
 @Data
+
 public class Team implements Serializable {
     /**
      * id

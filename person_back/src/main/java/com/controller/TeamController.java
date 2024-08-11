@@ -11,6 +11,7 @@ import com.model.Team;
 import com.model.User;
 import com.model.dto.TeamDTO;
 import com.model.request.AddTeamRequest;
+import com.model.request.JoinTeamRequest;
 import com.model.request.TeamUpdateRequest;
 import com.model.vo.TeamUserVO;
 import com.service.TeamService;
@@ -76,7 +77,7 @@ public class TeamController {
     /**
      * 更新队伍信息
      *
-     * @param team
+     * @param teamUpdateRequest
      * @return
      */
 
@@ -151,6 +152,24 @@ public class TeamController {
         Page<Team> resultPage = teamService.page(page, queryWrapper);
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(resultPage);
+    }
+
+    /**
+     * 加入队伍
+     *
+     * @param joinTeamRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/join")
+    public BaseResponse<Boolean> joinTeam(JoinTeamRequest joinTeamRequest, HttpServletRequest request) {
+        if (joinTeamRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        boolean result = teamService.joinTeam(joinTeamRequest, loginUser);
+        return ResultUtils.success(result);
+
     }
 
 }

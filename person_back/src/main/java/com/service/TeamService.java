@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.model.Team;
 import com.model.User;
 import com.model.dto.TeamDTO;
+import com.model.request.JoinTeamRequest;
 import com.model.request.TeamUpdateRequest;
 import com.model.vo.TeamUserVO;
 
@@ -24,7 +25,32 @@ public interface TeamService extends IService<Team> {
      */
     long addTeam(Team team, User loginUser);
 
+    /**
+     * 获取队伍列表
+     *
+     * @param teamDto
+     * @param isAdmin
+     * @return
+     */
     List<TeamUserVO> listTeams(TeamDTO teamDto, boolean isAdmin);
 
+    /**
+     * 更新队伍
+     *
+     * @param teamUpdateRequest
+     * @param loginUser
+     * @return
+     */
+
     boolean updateById(TeamUpdateRequest teamUpdateRequest, User loginUser);
+
+    /**
+     * 加入队伍
+     *
+     * @param joinTeamRequest
+     * @param loginUser
+     * @return
+     */
+
+    boolean joinTeam(JoinTeamRequest joinTeamRequest, User loginUser);
 }
