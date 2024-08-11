@@ -13,7 +13,7 @@
   </div>
   <!--  <router-link to="/">主页</router-link>-->
   <!--  <router-link to="/team">队伍</router-link>-->
-  <van-tabbar route>
+  <van-tabbar route @click="onChange">
     <van-tabbar-item to="/" icon="home-o">主页</van-tabbar-item>
     <van-tabbar-item to="/team" icon="search">组队</van-tabbar-item>
     <van-tabbar-item to="/user" icon="friends-o">个人</van-tabbar-item>
@@ -25,6 +25,9 @@
 // import {ref} from 'vue';
 // import {showToast} from 'vant';
 import {useRouter} from 'vue-router'
+import {getCurrentUserState} from "../global/state.ts";
+
+const currentUser = getCurrentUserState()
 
 const router = useRouter()
 const onClickLeft = () => {
@@ -34,6 +37,12 @@ const onClickLeft = () => {
 const onClickRight = () => {
   router.push(('/search'))
 }
+const onChange = async () => {
+  if (currentUser == null) {
+    router.push('/login')
+  }
+}
+
 // const active = ref("index");
 // const onChange = (index) => showToast(`标签 ${index}`);
 </script>

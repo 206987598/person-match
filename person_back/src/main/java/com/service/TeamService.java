@@ -5,6 +5,7 @@ import com.model.Team;
 import com.model.User;
 import com.model.dto.TeamDTO;
 import com.model.request.JoinTeamRequest;
+import com.model.request.QuitTeamRequest;
 import com.model.request.TeamUpdateRequest;
 import com.model.vo.TeamUserVO;
 
@@ -53,4 +54,13 @@ public interface TeamService extends IService<Team> {
      */
 
     boolean joinTeam(JoinTeamRequest joinTeamRequest, User loginUser);
+
+    /**
+     * 退出队伍
+     *
+     * @param quitTeamRequest
+     * @param loginUser
+     * @return
+     */
+    boolean quitTeam(QuitTeamRequest quitTeamRequest, User loginUser);
 }
