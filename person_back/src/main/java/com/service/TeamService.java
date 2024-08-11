@@ -63,4 +63,12 @@ public interface TeamService extends IService<Team> {
      * @return
      */
     boolean quitTeam(QuitTeamRequest quitTeamRequest, User loginUser);
+
+    /**
+     * 解散队伍
+     *
+     * @param id
+     * @return
+     */
+    boolean removeTeamById(long id, User loginUser);
 }

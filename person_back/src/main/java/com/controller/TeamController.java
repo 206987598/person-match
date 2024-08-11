@@ -181,11 +181,12 @@ public class TeamController {
      * @return
      */
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteTeam(Long id) {
+    public BaseResponse<Boolean> deleteTeam(@RequestBody Long id, HttpServletRequest request) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean result = teamService.removeById(id);
+        User loginUser = userService.getLoginUser(request);
+        boolean result = teamService.removeTeamById(id, loginUser);
         if (!result) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "删除失败");
         }
