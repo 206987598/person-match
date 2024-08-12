@@ -1,5 +1,5 @@
 import MyAxios from "../plugins/myAxios";
-import {getCurrentUserState, setCurrentUserState} from "../global/state.ts";
+import {setCurrentUserState} from "../global/state.ts";
 
 /**
  * 异步获取当前用户信息

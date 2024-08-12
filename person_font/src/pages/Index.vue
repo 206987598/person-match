@@ -1,7 +1,6 @@
 <template>
 <UserCardList :userList="userList"></UserCardList>
   <van-empty v-if=" ! userList||userList.length===0" description="数据出错了"/>
-
 </template>
 <script setup>
 import {useRoute, useRouter} from "vue-router";
