@@ -22,10 +22,13 @@
         <div>
           过期时间：{{ team.expireTime }}
         </div>
-
       </template>
       <template #footer>
         <van-button size="mini" type="primary" @click="doJoinTeam(team.id)">加入队伍</van-button>
+        <van-button v-if="team.userId === currentUser.id" size="mini" type="primary"
+                    @click="doUpdate(team.id)">
+          更新队伍
+        </van-button>
       </template>
     </van-card>
   </div>
@@ -35,16 +38,32 @@ import {TeamType} from "../models/team";
 import {teamSatusEnum} from "../constant/teamSatus";
 import MyAxios from "../plugins/myAxios";
 import {useRouter} from "vue-router";
+import {getCurrentUser} from "../service/User.ts";
+import {onMounted, ref} from "vue";
 
 const router = useRouter()
+
 interface teamCardList {
   teamList: TeamType[];
 }
 
+const currentUser = ref();
+onMounted(async () => {
+  currentUser.value = await getCurrentUser();
+})
 const avator = "https://img1.baidu.com/it/u=1968668429,2104382916&fm=253&fmt=auto&app=138&f=JPEG?w=507&h=500";
 const props = withDefaults(defineProps<teamCardList>(), {
   teamList: []
 });
+const doUpdate = (id: number) => {
+  router.push({
+    path: '/team/update',
+    query: {
+      id
+    }
+  })
+
+}
 const doJoinTeam = async (id: number) => {
   const res = await MyAxios.post('/team/join', {
     teamId: id,
@@ -53,7 +72,7 @@ const doJoinTeam = async (id: number) => {
   if (res?.code === 0) {
     alert("加入队伍成功")
     router.replace("/user")
-  }else {
+  } else {
     alert("加入队伍失败")
     router.back()
   }

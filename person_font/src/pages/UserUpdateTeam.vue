@@ -34,11 +34,6 @@
             @cancel="showPicker = false"
             :min-date="minDate"/>
       </van-popup>
-      <van-field name="stepper" label="请选择人数">
-        <template #input>
-          <van-stepper v-model="formData.maxNum" :max="10" :min="3"/>
-        </template>
-      </van-field>
       <van-field name="radio" label="单选框">
         <template #input>
           <van-radio-group v-model="formData.status" direction="horizontal">
@@ -67,12 +62,29 @@
   </van-form>
 </template>
 <script setup>
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 import MyAxios from "../plugins/myAxios.js";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 
+const route = useRoute()
 const router = useRouter()
+const id = route.query.id;
+const result = ref('');
+onMounted(async () => {
+  const res = await MyAxios.get('/team/get', {
+    params: {
+      id,
+    }
+  });
+  console.log(route.query.id)
+  if (res?.code == 0) {
+    result.value = res.data.expireTime;
+    formData.value = res.data;
+  }
+})
+
+
 const onSubmit = async () => {
   console.log('开始向后台传参数');
 // todo 前段参数验证
@@ -80,20 +92,21 @@ const onSubmit = async () => {
     ...formData.value,
     status: Number(formData.value.status),
   }
-  const res = await MyAxios.post("/team/save", postData);
+  const res = await MyAxios.post("/team/update", postData);
   if (res?.code == 0 && res.data) {
     console.log("看到这里就已经执行成功了")
-    alert('创建队伍成功');
+    alert('更新队伍成功');
     router.push({
       path: '/team',
       replace: true
     })
   } else {
-    alert('创建队伍失败');
+    alert('更新队伍失败');
   }
 
 }
-const result = ref('');
+
+
 const showPicker = ref(false);
 const onConfirm = ({selectedValues}) => {
   result.value = selectedValues.join('-');
@@ -101,15 +114,8 @@ const onConfirm = ({selectedValues}) => {
   showPicker.value = false;
 };
 const minDate = ref(new Date());
-const initFormDate = {
-  "name": "",
-  "description": "",
-  "maxNum": 3,
-  "status": 0,
-  "expireTime": null,
-  "password": "",
-}
-const formData = ref({...initFormDate})
+
+const formData = ref({})
 
 
 </script>

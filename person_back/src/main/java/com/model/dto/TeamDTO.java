@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 队伍查询封装类
  */
+//
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TeamDTO extends PageRequest {
