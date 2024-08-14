@@ -29,6 +29,9 @@
                     @click="doUpdate(team.id)">
           更新队伍
         </van-button>
+        <van-button size="mini" type="danger" @click="doQuitTeam(team.id)">退出队伍</van-button>
+        <!--todo 队伍页面只有创建者能看到-->
+        <van-button size="mini" type="danger" @click="doDeleteTeam(team.id)">解散队伍</van-button>
       </template>
     </van-card>
   </div>
@@ -55,6 +58,7 @@ const avator = "https://img1.baidu.com/it/u=1968668429,2104382916&fm=253&fmt=aut
 const props = withDefaults(defineProps<teamCardList>(), {
   teamList: []
 });
+// 更新队伍
 const doUpdate = (id: number) => {
   router.push({
     path: '/team/update',
@@ -64,6 +68,7 @@ const doUpdate = (id: number) => {
   })
 
 }
+// 加入队伍
 const doJoinTeam = async (id: number) => {
   const res = await MyAxios.post('/team/join', {
     teamId: id,
@@ -77,6 +82,32 @@ const doJoinTeam = async (id: number) => {
     router.back()
   }
 
+}
+// 退出队伍
+const doQuitTeam = async (id: number) => {
+  const res = await MyAxios.post('/team/quit', {
+    teamId: id
+  });
+  if (res?.code === 0) {
+    alert("退出队伍成功")
+     router.replace("/user")
+  } else {
+    alert("退出队伍失败")
+    router.back()
+  }
+}
+// 解散队伍
+const doDeleteTeam = async (id: number) => {
+  const res = await MyAxios.post('/team/delete', {
+    id,
+  });
+  if (res?.code === 0) {
+    alert("解散队伍成功")
+     router.replace("/user")
+  } else {
+    alert("解散队伍失败")
+    router.back()
+  }
 }
 </script>
 <style scoped>

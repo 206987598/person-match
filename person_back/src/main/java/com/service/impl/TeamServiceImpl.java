@@ -135,6 +135,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             if (id != null && id > 0) {
                 queryWrapper.eq("id", id); // 根据id精确查询
             }
+//            List idList = teamDto.getIdList();
+//            if (idList != null && !idList.isEmpty()) {
+//                queryWrapper.in("id", idList); // 根据id列表精确查询
+//            }
             String name = teamDto.getName();
             if (StringUtils.isNotBlank(name)) {
                 queryWrapper.like("name", name); // 根据名称模糊查询

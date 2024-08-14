@@ -11,10 +11,7 @@ import com.model.Team;
 import com.model.User;
 import com.model.UserTeam;
 import com.model.dto.TeamDTO;
-import com.model.request.AddTeamRequest;
-import com.model.request.JoinTeamRequest;
-import com.model.request.QuitTeamRequest;
-import com.model.request.TeamUpdateRequest;
+import com.model.request.*;
 import com.model.vo.TeamUserVO;
 import com.service.TeamService;
 import com.service.UserService;
@@ -134,8 +131,11 @@ public class TeamController {
         if (teamDto == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        // 获取当前登录用户信息
         User loginUser = userService.getLoginUser(request);
-        teamDto.setId(loginUser.getId());
+        // 将登录用户的ID设置到队伍信息对象中
+        teamDto.setUserId(loginUser.getId());
+        // 查询并获取队伍列表信息
         List<TeamUserVO> teamList = teamService.listTeams(teamDto, true);
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
@@ -143,6 +143,7 @@ public class TeamController {
 
     /**
      * 获取我加入的队伍
+     *
      * @param teamDto
      * @param request
      * @return
@@ -243,18 +244,19 @@ public class TeamController {
     /**
      * 队伍删除
      *
-     * @param id
+     * @param deleteTeamRequest
      * @return
      */
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteTeam(@RequestBody Long id, HttpServletRequest request) {
-        if (id <= 0) {
+    public BaseResponse<Boolean> deleteTeam(@RequestBody DeleteTeamRequest deleteTeamRequest, HttpServletRequest request) {
+        Long id = deleteTeamRequest.getId();
+        if (deleteTeamRequest == null || id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
         boolean result = teamService.removeTeamById(id, loginUser);
         if (!result) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "删除失败");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "解散失败");
         }
         return ResultUtils.success(true);
     }
