@@ -7,6 +7,9 @@ import SearchResultPage from "../pages/SearchResultPage.vue";
 import UserLogin from "../pages/UserLogin.vue";
 import UserAddTeam from "../pages/UserAddTeam.vue";
 import UserUpdateTeam from "../pages/UserUpdateTeam.vue";
+import UserCreateTeamPage from "../pages/UserCreateTeamPage.vue";
+import UserJoinTeamPage from "../pages/UserJoinTeamPage.vue";
+import UserUpdatePage from "../pages/UserUpdatePage.vue";
 
 
 const routes = [
@@ -19,5 +22,8 @@ const routes = [
     {path: '/login', component: UserLogin},
     {path: '/team/add', component: UserAddTeam},
     {path: '/team/update', component: UserUpdateTeam},
+    {path: '/user/create', component: UserCreateTeamPage},
+    {path: '/user/join', component: UserJoinTeamPage},
+    {path: '/user/update', component: UserUpdatePage},
 ]
 export default routes;

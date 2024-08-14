@@ -222,7 +222,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             throw new BusinessException(ErrorCode.NULL_ERROR, "队伍不存在");
         }
         // 检查当前用户是否有权限修改团队信息
-        if (!oldTeam.getUserId().equals(loginUser.getId()) || !userService.isAdmin(loginUser)) {
+        if (!oldTeam.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "无权限");
         }
         // 根据团队状态值获取对应的枚举

@@ -9,6 +9,7 @@ import com.common.ResultUtils;
 import com.exception.BusinessException;
 import com.model.Team;
 import com.model.User;
+import com.model.UserTeam;
 import com.model.dto.TeamDTO;
 import com.model.request.AddTeamRequest;
 import com.model.request.JoinTeamRequest;
@@ -17,13 +18,17 @@ import com.model.request.TeamUpdateRequest;
 import com.model.vo.TeamUserVO;
 import com.service.TeamService;
 import com.service.UserService;
+import com.service.UserTeamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 组队控制器
@@ -37,6 +42,8 @@ public class TeamController {
     private TeamService teamService;
     @Resource
     private UserService userService;
+    @Resource
+    private UserTeamService userTeamService;
 
     /**
      * 创建队伍
@@ -104,12 +111,71 @@ public class TeamController {
      */
     @GetMapping("/list")
     public BaseResponse<List<TeamUserVO>> getTeamList(TeamDTO teamDto, HttpServletRequest request) {
-        // 检查团队信息对象是否为空，如果为空则抛出业务异常
+        // 检查队伍信息对象是否为空，如果为空则抛出业务异常
         if (teamDto == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         boolean isAdmin = userService.isAdmin(request);
         List<TeamUserVO> teamList = teamService.listTeams(teamDto, isAdmin);
+        // 返回查询结果，包装在成功的结果对象中
+        return ResultUtils.success(teamList);
+    }
+
+    /**
+     * 获取我创建的队伍
+     *
+     * @param teamDto
+     * @param request
+     * @return
+     */
+    @GetMapping("/list/myCreateTeam")
+    public BaseResponse<List<TeamUserVO>> getMyCreateList(TeamDTO teamDto, HttpServletRequest request) {
+        // 检查队伍信息对象是否为空，如果为空则抛出业务异常
+        if (teamDto == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        teamDto.setId(loginUser.getId());
+        List<TeamUserVO> teamList = teamService.listTeams(teamDto, true);
+        // 返回查询结果，包装在成功的结果对象中
+        return ResultUtils.success(teamList);
+    }
+
+    /**
+     * 获取我加入的队伍
+     * @param teamDto
+     * @param request
+     * @return
+     */
+    @GetMapping("/list/myJoinTeam")
+    public BaseResponse<List<TeamUserVO>> getMyJoinTeamList(TeamDTO teamDto, HttpServletRequest request) {
+        // 检查队伍信息对象是否为空，如果为空则抛出业务异常
+        if (teamDto == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 获取当前登录用户信息
+        User loginUser = userService.getLoginUser(request);
+        // 构建查询条件，查询当前用户所在的所有队伍
+        QueryWrapper<UserTeam> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", loginUser.getId());
+        // 执行查询，获取用户所在队伍的列表
+        List<UserTeam> userTeamList = userTeamService.list(queryWrapper);
+        // 根据队伍ID对查询结果进行分组
+        //取出不重复的队伍ID
+        //teamId userId
+        //1:1
+        //1:2
+        //2:3
+        //result
+        //1:[1,2]
+        //2:[3]
+        Map<Long, List<UserTeam>> mapList = userTeamList.stream().collect(Collectors.groupingBy(UserTeam::getTeamId));
+        // 获取所有队伍ID的列表
+        ArrayList idList = new ArrayList<>(mapList.keySet());
+        // 将队伍ID列表设置到队伍信息对象中，以便后续查询使用
+        teamDto.setIdList(idList);
+        // 根据队伍信息对象查询详细的队伍信息和成员信息
+        List<TeamUserVO> teamList = teamService.listTeams(teamDto, true);
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }
@@ -122,17 +188,17 @@ public class TeamController {
      */
     @GetMapping("/list/page")
     public BaseResponse<Page<Team>> getTeamPage(TeamDTO teamDto) {
-        // 检查团队信息对象是否为空，如果为空则抛出业务异常
+        // 检查队伍信息对象是否为空，如果为空则抛出业务异常
         if (teamDto == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        // 初始化团队实体对象，并将DTO中的属性复制到实体对象中
+        // 初始化队伍实体对象，并将DTO中的属性复制到实体对象中
         Team team = new Team();
         Page<Team> page = new Page<>(teamDto.getPageNum(), teamDto.getPageSize());
         BeanUtils.copyProperties(teamDto, team);
         // 构建查询条件包装器，用于后续的查询操作
         QueryWrapper<Team> queryWrapper = new QueryWrapper<>(team);
-        // 使用构建的查询条件查询所有匹配的团队信息
+        // 使用构建的查询条件查询所有匹配的队伍信息
         Page<Team> resultPage = teamService.page(page, queryWrapper);
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(resultPage);
@@ -164,7 +230,7 @@ public class TeamController {
      * @return
      */
     @PostMapping("/quit")
-    public BaseResponse<Boolean> joinTeam(QuitTeamRequest quitTeamRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> joinTeam(@RequestBody QuitTeamRequest quitTeamRequest, HttpServletRequest request) {
         if (quitTeamRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

@@ -19,6 +19,7 @@ public class TeamUserVO implements Serializable {
      */
     private Long id;
 
+
     /**
      * 队伍名称
      */
@@ -67,7 +68,7 @@ public class TeamUserVO implements Serializable {
     /**
      * 创建人信息
      */
-     UserVO createUserVO;
+    UserVO createUserVO;
 
     private static final long serialVersionUID = 1L;
 }

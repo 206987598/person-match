@@ -5,6 +5,8 @@ import com.model.request.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * 队伍查询封装类
  */
@@ -17,6 +19,11 @@ public class TeamDTO extends PageRequest {
      */
     private Long id;
 
+    /**
+     * id列表
+     */
+
+    private List idList;
     /**
      * 队伍名称
      */

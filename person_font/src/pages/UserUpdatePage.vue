@@ -1,10 +1,21 @@
 <template>
   <template v-if="user">
-    <img :src="user.avatarUrl" width="100" height="100"/>
-    <van-cell title="当前用户" :value="user?.username"/>
-    <van-cell title="我的信息" is-link to="/user/update"/>
-    <van-cell title="我加入的队伍" is-link to="/user/join"/>
-    <van-cell title="我创建的队伍" is-link to="/user/create"/>
+    <van-cell title="昵称" is-link to="/user/edit" :value="user.username"
+              @click="doEdit('username','昵称',user.username)"/>
+    <van-cell title="账号" is-link to="/user/edit" :value="user.userAccount"
+              @click="doEdit('userAccount','账号',user.userAccount)"/>
+    <van-cell title="头像" is-link to="/user/edit">
+      <img :src="user.avatarUrl" width="50" height="50"/>
+    </van-cell>
+    <van-cell title="性别"  is-link to="/user/edit" :value="user.gender" @click="doEdit('gender','性别',user.gender)">
+      {{user.gender==0?'男':user.gender==1?'女':'未知'}}
+    </van-cell>
+
+
+    <van-cell title="电话" is-link to="/user/edit" :value="user.phone" @click="doEdit('phone','电话',user.phone)"/>
+    <van-cell title="邮箱" is-link to="/user/edit" :value="user.email" @click="doEdit('email','邮箱',user.email)"/>
+    <van-cell title="星球编号" :value="user.planetCode"/>
+    <van-cell title="创建时间" :value="user.createTime"/>
   </template>
 </template>
 <script setup lang="ts">
