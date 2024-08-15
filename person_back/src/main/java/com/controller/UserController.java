@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import static com.contant.UserConstant.USER_LOGIN_STATE;
 
 
@@ -152,6 +153,15 @@ public class UserController {
 
     }
 
+    /**
+     * 推荐用户
+     *
+     * @param pageSize
+     * @param pageNum
+     * @param request
+     * @return
+     */
+    //todo 优化推荐功能
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         // 获取当前登录用户
@@ -168,10 +178,10 @@ public class UserController {
         // 构建查询条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         // 执行查询，获取用户列表
-         userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
-         // 缓存到redis
+        userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        // 缓存到redis
         try {
-            operations.set(redisKey, userPage,1, TimeUnit.HOURS);
+            operations.set(redisKey, userPage, 1, TimeUnit.HOURS);
         } catch (Exception e) {
             log.error("redis set key error", e);
         }
@@ -246,5 +256,22 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+
+    /**
+     * 获取相似度高的用户
+     *
+     * @param num
+     * @param request
+     * @return
+     */
+    @GetMapping("/match")
+    public BaseResponse<List<User>> matchUsers(long num, HttpServletRequest request) {
+        if (num <= 0 || num > 20) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        List<User> matchedUsers = userService.matchUsers(num, loginUser);
+        return ResultUtils.success(matchedUsers);
+    }
 
 }

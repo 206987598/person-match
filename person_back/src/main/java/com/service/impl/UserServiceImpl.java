@@ -2,6 +2,7 @@ package com.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.common.DistanceUtils;
 import com.common.ErrorCode;
 import com.exception.BusinessException;
 import com.google.gson.Gson;
@@ -11,16 +12,14 @@ import com.model.User;
 import com.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.marshalling.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -49,6 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 盐值，混淆密码
      */
     private static final String passwordBefore = "lack";
+
 
     /**
      * /**
@@ -350,6 +350,98 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         });
         return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
+
+    /**
+     * 获取匹配用户
+     *
+     * @param num
+     * @param loginUser
+     * @return
+     */
+
+    @Override
+    public List<User> matchUsers(long num, User loginUser) {
+        // 创建查询包装器，用于查询用户
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 选择查询字段为id和tags
+        queryWrapper.select("id", "tags");
+        // 过滤条件：tags不为空
+        queryWrapper.isNotNull("tags");
+        // 获取所有用户列表
+        List<User> userList = this.list();
+        // 获取当前登录用户的标签字符串
+        String tags = loginUser.getTags();
+        // 创建Gson对象用于JSON解析
+        Gson gson = new Gson();
+        // 将标签字符串解析为标签列表
+        List<String> tagNameList = gson.fromJson(tags, new TypeToken<List<String>>() {
+        }.getType());
+        // 创建用户与距离的配对列表
+        List<Pair<User, Long>> list = new ArrayList<>();
+//        // 创建一个排序映射，用于存储用户索引和标签距离
+//        SortedMap<Integer, Long> indexDistanceMap = new TreeMap<>();
+        // 遍历用户列表
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            // 获取当前用户的标签字符串
+            String userTags = user.getTags();
+            // 如果用户没有标签，则跳过
+            if (StringUtils.isBlank(userTags) || user.getId() == loginUser.getId()) {
+                continue;
+            }
+            // 将用户标签字符串解析为标签列表
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            }.getType());
+            // 计算当前用户标签与登录用户标签的最小距离
+            long minDistance = DistanceUtils.minDistance(tagNameList, userTagList);
+//            // 将用户索引和最小距离存入映射
+//            indexDistanceMap.put(i, minDistance);
+            // 将用户和距离添加到配对列表
+            list.add(new Pair<>(user, minDistance));
+        }
+        //按编辑距离进行升序
+        List<Pair<User, Long>> topUserPairList = list.stream()
+                .sorted((a, b) -> (int) (a.getB() - b.getB()))
+                .limit(num)
+                .collect(Collectors.toList());
+
+//        // 创建一个列表来收集最接近的用户
+//        List<User> collectList = new ArrayList<>();
+//        int i = 0;
+//        // 遍历排序后的用户索引和距离映射
+//        for (Map.Entry<Integer, Long> entry : indexDistanceMap.entrySet()) {
+//            // 如果收集的用户数量已达到指定数量，则停止遍历
+//            if (i > num) {
+//                break;
+//            }
+//            // 根据索引获取用户
+//            User user = userList.get(entry.getKey());
+//            // 输出用户ID和距离信息（此处的输出根据实际需求可能需要调整）
+//            System.out.println(user.getId() + ";" + entry.getKey() + ":" + entry.getValue());
+//
+//            // 增加收集的用户数量
+//            i++;
+//    }
+        // 将排序后的用户配对列表转换为用户列表
+        //原本的列表是
+        List<Long> collectList = topUserPairList.stream().map(pair -> pair.getA().getId()).collect(Collectors.toList());
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.in("id", collectList);
+        // 将用户列表转换为Map，键为用户ID，值为用户对象
+        //1,2,3
+        //1->User1,2->User2,3->User3
+        Map<Long, List<User>> users = this.list(userQueryWrapper)
+                .stream().map(user -> getSafetyUser(user))
+                .collect(Collectors.groupingBy(User::getId));
+        List<User> finallyUserList = new ArrayList<>();
+        for (Long userId : collectList) {
+            finallyUserList.add(users.get(userId).get(0));
+        }
+        // 返回最接近的用户列表
+        return finallyUserList;
+    }
+
+
 }
 
 

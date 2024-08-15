@@ -1,4 +1,4 @@
-<template>
+<template id="basic-layout">
   <van-nav-bar
       title="标题"
       left-arrow
