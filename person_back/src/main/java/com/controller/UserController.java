@@ -50,7 +50,7 @@ public class UserController {
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
-//            return ResultUtils.error(ErrorCode.NULL_ERROR);
+
             throw new BusinessException(ErrorCode.NULL_ERROR, "参数为空");
         }
 
@@ -109,15 +109,22 @@ public class UserController {
      */
     @GetMapping("/current")
     public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null) {
-            return null;
+        User loginUser = userService.getLoginUser(request);
+        if (loginUser == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Long userId = currentUser.getId();
-        User user = userService.getById(userId);
+        User user = userService.getById(loginUser.getId());
         User safetyUser = userService.getSafetyUser(user);
         return ResultUtils.success(safetyUser);
+//        Object loginUser = request.getSession().getAttribute(USER_LOGIN_STATE);
+//        User currentUser = (User) loginUser;
+//        if (currentUser == null) {
+//            return null;
+//        }
+//        Long userId = currentUser.getId();
+//        User user = userService.getById(userId);
+//        User safetyUser = userService.getSafetyUser(user);
+//        return ResultUtils.success(safetyUser);
     }
 
     /**

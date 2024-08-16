@@ -197,7 +197,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public int loginOut(HttpServletRequest request) {
         //移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
-        throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        return 1;
     }
 
     /**
@@ -249,12 +249,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 从会话中获取用户对象，如果为空则抛出未登录异常
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        if (userObj == null) {
+        Object loginUser = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (loginUser == null) {
             throw new BusinessException(ErrorCode.NO_LOGIN);
         }
         // 将用户对象转换为User类型并返回
-        return (User) userObj;
+        return (User) loginUser;
 
     }
 

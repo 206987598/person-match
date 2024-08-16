@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -108,12 +109,28 @@ public class TeamController {
      */
     @GetMapping("/list")
     public BaseResponse<List<TeamUserVO>> getTeamList(TeamDTO teamDto, HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
         // 检查队伍信息对象是否为空，如果为空则抛出业务异常
         if (teamDto == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         boolean isAdmin = userService.isAdmin(request);
         List<TeamUserVO> teamList = teamService.listTeams(teamDto, isAdmin);
+        List<Long> teamIdList = teamList.stream().map(TeamUserVO::getId).collect(Collectors.toList());
+        QueryWrapper<UserTeam> queryWrapper = new QueryWrapper<>();
+        try {
+            queryWrapper.eq("userId", loginUser.getId());
+            queryWrapper.in("teamId", teamIdList);
+            List<UserTeam> userTeamList = userTeamService.list(queryWrapper);
+            //查询已加入队伍的id
+            Set<Long> teamIdSet = userTeamList.stream().map(UserTeam::getTeamId).collect(Collectors.toSet());
+            //遍历队伍列表，符合条件的队伍设置hasJoin为true
+            teamList.forEach(team -> {
+                boolean hasJoin = teamIdSet.contains(team.getId());
+                team.setHasJoin(hasJoin);
+            });
+        } catch (Exception e) {
+        }
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }
@@ -137,7 +154,6 @@ public class TeamController {
         teamDto.setUserId(loginUser.getId());
         // 查询并获取队伍列表信息
         List<TeamUserVO> teamList = teamService.listTeams(teamDto, true);
-        // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }
 
@@ -170,13 +186,26 @@ public class TeamController {
         //result
         //1:[1,2]
         //2:[3]
-        Map<Long, List<UserTeam>> mapList = userTeamList.stream().collect(Collectors.groupingBy(UserTeam::getTeamId));
+        Map<Long, List<UserTeam>> mapList = userTeamList.stream().collect(Collectors.groupingBy(UserTeam::getUserId));
         // 获取所有队伍ID的列表
         ArrayList idList = new ArrayList<>(mapList.keySet());
         // 将队伍ID列表设置到队伍信息对象中，以便后续查询使用
         teamDto.setIdList(idList);
         // 根据队伍信息对象查询详细的队伍信息和成员信息
         List<TeamUserVO> teamList = teamService.listTeams(teamDto, true);
+//        List<Long> list = teamList.stream().map(TeamUserVO::getId).collect(Collectors.toList());
+//        for (Long id : list) {
+//            queryWrapper.eq("userId", loginUser.getId());
+//            queryWrapper.eq("teamId", id);
+//            List<UserTeam> TeamList = userTeamService.list(queryWrapper);
+//            //查询已加入队伍的id
+//            Set<Long> teamIdSet = TeamList.stream().map(UserTeam::getTeamId).collect(Collectors.toSet());
+//            //遍历队伍列表，符合条件的队伍设置hasJoin为true
+//            teamList.forEach(team -> {
+//                boolean hasJoin = teamIdSet.contains(team.getId());
+//                team.setHasJoin(hasJoin);
+//            });
+//        }
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }

@@ -70,5 +70,10 @@ public class TeamUserVO implements Serializable {
      */
     UserVO createUserVO;
 
+    /**
+     * 是否加入
+     */
+    private boolean hasJoin = false;
+
     private static final long serialVersionUID = 1L;
 }

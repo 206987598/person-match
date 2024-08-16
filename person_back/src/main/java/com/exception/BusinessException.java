@@ -19,6 +19,14 @@ public class BusinessException extends RuntimeException {
      */
     private final String description;
 
+
+    /**
+     *
+     * @param code
+     * @param message
+     * @param description
+     */
+
     public BusinessException(int code, String message, String description) {
         super(message);
         this.code = code;
