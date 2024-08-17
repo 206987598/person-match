@@ -16,7 +16,11 @@ MyAxios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 MyAxios.interceptors.response.use(function (response) {
-    console.log("我收到响应了")
+    console.log("我收到响应了",response)
+    if (response?.data?.code === 40100) {
+        const redirect = window.location.href;
+        window.location.href = `/user/login?redirect=${redirect}`;
+    }
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么
     return response.data;

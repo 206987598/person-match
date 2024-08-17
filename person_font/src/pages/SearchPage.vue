@@ -102,9 +102,6 @@ const onSearch = (val) => {
     return temParent;
   })
 
-  // tagList.forEach(parentTag => parentTag.children=parentTag.children.filter(item => item.text.includes(SearchText.value)))
-  // activeIds.value = tagList.flatMap(parent => parent.children)
-  //     .filter(item => item.text.includes(SearchText.value));
 };
 const onCancel = () => {
   SearchText.value = ''

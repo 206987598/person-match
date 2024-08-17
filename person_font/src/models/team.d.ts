@@ -5,14 +5,16 @@ import {UserType} from "./user";
  */
 export type TeamType = {
     id: number,
+    userId:number,
     name: string,
     description: string,
     maxNum: number,
-    // todo 定义枚举值更规范
     status: number,
     expireTime?: Date,
     password: string,
     createTime: Date,
     updateTime: Date,
     createUser?: UserType,
+    hasJoin: boolean,
+    hasJoinNum:number,
 }

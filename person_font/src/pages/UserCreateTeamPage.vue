@@ -12,9 +12,6 @@ import MyAxios from "../plugins/myAxios.js";
 import {ref, onMounted} from "vue";
 
 const router = useRouter()
-const doJoinTeam = () => {
-  router.push("/team/add")
-}
 const teamList = ref([]);
 const searchText = ref("");
 const SearchList = async (val) => {

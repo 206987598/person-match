@@ -36,7 +36,7 @@ const router = useRouter()
 const onSubmit = async () => {
   const currentUser = await getCurrentUser()
   if (!currentUser) {
-    return alert('请先登录')
+    return showToast('请先登录')
   }
   const res = await MyAxios.post('user/update', {
     'id': currentUser.id,
@@ -44,10 +44,10 @@ const onSubmit = async () => {
   })
   console.log("更新请求")
   if (res.code === 0 && res.data > 0) {
-    alert('修改成功')
+    showToast('修改成功')
     router.back()
   } else {
-    alert('修改失败')
+    showToast('修改失败')
   }
 };
 </script>

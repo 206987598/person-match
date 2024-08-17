@@ -13,17 +13,17 @@ import UserUpdatePage from "../pages/UserUpdatePage.vue";
 
 
 const routes = [
-    {path: '/', component: Index},
-    {path: '/team', component: TeamPage},
-    {path: '/user', component: UserPage},
-    {path: '/search', component: SearchPage},
-    {path: '/user/edit', component: UserEdit},
-    {path: '/user/list', component: SearchResultPage},
-    {path: '/login', component: UserLogin},
-    {path: '/team/add', component: UserAddTeam},
-    {path: '/team/update', component: UserUpdateTeam},
-    {path: '/user/create', component: UserCreateTeamPage},
-    {path: '/user/join', component: UserJoinTeamPage},
-    {path: '/user/update', component: UserUpdatePage},
+    {path: '/',component: Index},
+    {path: '/team',title: '队伍', component: TeamPage},
+    {path: '/user', title: '用户',component: UserPage},
+    {path: '/search',title: '搜索', component: SearchPage},
+    {path: '/user/edit',title: '编辑', component: UserEdit},
+    {path: '/user/list',title: '搜索结果', component: SearchResultPage},
+    {path: '/user/login', title: '登录',component: UserLogin},
+    {path: '/team/add', title: '新建队伍',component: UserAddTeam},
+    {path: '/team/update',title: '更新队伍', component: UserUpdateTeam},
+    {path: '/user/create',title: '创建的队伍', component: UserCreateTeamPage},
+    {path: '/user/join',title: '加入的队伍', component: UserJoinTeamPage},
+    {path: '/user/update',title: '用户信息', component: UserUpdatePage},
 ]
 export default routes;

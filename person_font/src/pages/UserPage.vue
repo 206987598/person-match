@@ -1,28 +1,22 @@
 <template>
   <template v-if="user">
-    <img :src="user.avatarUrl" width="100" height="100"/>
+    <div style="text-align: center;">
+      <img :src="user.avatarUrl" width="100" height="100" style="border-radius: 45%"/>
+    </div>
     <van-cell title="当前用户" :value="user?.username"/>
     <van-cell title="我的信息" is-link to="/user/update"/>
     <van-cell title="我加入的队伍" is-link to="/user/join"/>
     <van-cell title="我创建的队伍" is-link to="/user/create"/>
   </template>
+  <van-button type="danger"  block @click="logOut" style="margin-bottom: 10px">退出登录</van-button>
 </template>
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {getCurrentUser} from "../service/User.ts";
+import MyAxios from "../plugins/myAxios";
 
-// const user = {
-//   id: 1,
-//   username: 'lack',
-//   userAccount: 'lackAdmin',
-//   avatarUrl: 'https://img1.baidu.com/it/u=1968668429,2104382916&fm=253&fmt=auto&app=138&f=JPEG?w=507&h=500',
-//   gender: '男',
-//   phone: '12345678914',
-//   email: '206987598@qq.com',
-//   createTime: new Date(),
-//   planetCode: 16533,
-// }
+
 // 定义一个响应式引用，用于存储当前用户信息
 const user = ref()
 /**
@@ -41,17 +35,12 @@ const Router = useRouter()
  * @param {string} currentValue - 当前编辑字段的值
  * 路由跳转到编辑页面，并传递编辑信息作为查询参数
  */
-const doEdit = (editKey: string, editName: string, currentValue: string) => {
-  Router.push({
-    path: '/user/edit',
-    query: {
-      editKey,
-      editName,
-      currentValue
-    }
-  })
+const logOut = async () => {
+  const res = await MyAxios.post("/user/logout");
+  if (res.code === 0){
+    Router.replace("/login");
+  }
 }
-
 </script>
 <style scoped>
 

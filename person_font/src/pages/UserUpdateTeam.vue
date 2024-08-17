@@ -95,13 +95,13 @@ const onSubmit = async () => {
   const res = await MyAxios.post("/team/update", postData);
   if (res?.code == 0 && res.data) {
     console.log("看到这里就已经执行成功了")
-    alert('更新队伍成功');
+    showToast('更新队伍成功');
     router.push({
       path: '/team',
       replace: true
     })
   } else {
-    alert('更新队伍失败');
+    showToast('更新队伍失败');
   }
 
 }
