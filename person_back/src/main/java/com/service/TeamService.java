@@ -1,5 +1,6 @@
 package com.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.model.Team;
 import com.model.User;
@@ -71,4 +72,5 @@ public interface TeamService extends IService<Team> {
      * @return
      */
     boolean removeTeamById(long id, User loginUser);
+
 }

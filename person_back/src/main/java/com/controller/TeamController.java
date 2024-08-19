@@ -148,36 +148,34 @@ public class TeamController {
     /**
      * 获取我创建的队伍
      *
-     * @param teamDto
      * @param request
      * @return
      */
     @GetMapping("/list/myCreateTeam")
-    public BaseResponse<List<TeamUserVO>> getMyCreateList(TeamDTO teamDto, HttpServletRequest request) {
-        // 检查队伍信息对象是否为空，如果为空则抛出业务异常
-        if (teamDto == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        // 获取当前登录用户信息
+    public BaseResponse<List<Team>> getMyCreateList(HttpServletRequest request) {
+
         User loginUser = userService.getLoginUser(request);
+        long userId = loginUser.getId();
         // 将登录用户的ID设置到队伍信息对象中
-        teamDto.setUserId(loginUser.getId());
         // 查询并获取队伍列表信息
-        List<TeamUserVO> teamList = teamService.listTeams(teamDto, true);
-        Map<Long, List<TeamUserVO>> userId = teamList.stream().collect(Collectors.groupingBy(TeamUserVO::getUserId));
-        // 创建一个查询包装器，用于查询用户与团队的关系
-        QueryWrapper<UserTeam> queryWrapper = new QueryWrapper<>();
-        // 设置查询条件，过滤出特定的团队ID
-        queryWrapper.eq("userId", userId);
-        // 执行查询，获取所有符合条件的用户与团队关系数据
-        List<UserTeam> TeamList = userTeamService.list(queryWrapper);
-        // 将查询结果按照团队ID分组
-        Map<Long, List<UserTeam>> listMap = TeamList.stream().collect(Collectors.groupingBy(UserTeam::getTeamId));
-        // 遍历团队列表，设置每个团队的加入人数
-        teamList.forEach(team -> {
-            // 如果当前团队的加入人数列表为空，则默认为空列表，避免NullPointerException
-            team.setHasJoinNum(listMap.getOrDefault(team.getId(), new ArrayList<>()).size());
-        });
+        QueryWrapper<Team> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("userId",userId);
+        List<Team> teamList = teamService.list(queryWrapper);
+//        List<TeamUserVO> teamList = teamService.listTeams(userId,true);
+//        Map<Long, List<TeamUserVO>> userId = teamList.stream().collect(Collectors.groupingBy(TeamUserVO::getUserId));
+//        // 创建一个查询包装器，用于查询用户与团队的关系
+//        QueryWrapper<UserTeam> queryWrapper = new QueryWrapper<>();
+//        // 设置查询条件，过滤出特定的团队ID
+//        queryWrapper.eq("userId", userId);
+//        // 执行查询，获取所有符合条件的用户与团队关系数据
+//        List<UserTeam> TeamList = userTeamService.list(queryWrapper);
+//        // 将查询结果按照团队ID分组
+//        Map<Long, List<UserTeam>> listMap = TeamList.stream().collect(Collectors.groupingBy(UserTeam::getTeamId));
+//        // 遍历团队列表，设置每个团队的加入人数
+//        teamList.forEach(team -> {
+//            // 如果当前团队的加入人数列表为空，则默认为空列表，避免NullPointerException
+//            team.setHasJoinNum(listMap.getOrDefault(team.getId(), new ArrayList<>()).size());
+//        });
         // 返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }
@@ -246,7 +244,7 @@ public class TeamController {
             // 如果当前团队的加入人数列表为空，则默认为空列表，避免NullPointerException
             team.setHasJoinNum(listMap.getOrDefault(team.getId(), new ArrayList<>()).size());
         });
-        // 返回查询结果，包装在成功的结果对象中
+       //  返回查询结果，包装在成功的结果对象中
         return ResultUtils.success(teamList);
     }
 
