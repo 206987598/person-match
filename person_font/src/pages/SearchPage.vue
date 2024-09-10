@@ -58,6 +58,18 @@ const doSearch = () => {
 //定义原始标签列表
 const originTagList = [
   {
+    text:'意向',
+    children: [
+      {text:'Java',id:'Java'},
+      {text:'C++',id:'C++'},
+      {text:'C#',id:'C#'},
+      {text:'Python',id:'Python'},
+      {text:'Rust',id:'Rust'},
+      {text:'Go',id:'Go'},
+      {text:'Web',id:'Web'},
+    ]
+  },
+  {
     text: '性别',
     children: [
       {text: '男', id: '男'},

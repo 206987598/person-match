@@ -16,41 +16,45 @@
           placeholder="密码"
           :rules="[{ required: true, message: '请填写密码' }]"
       />
+      <van-field
+          v-model="checkPassword"
+          type="password"
+          name="checkPassword"
+          label="确认密码"
+          placeholder="确认密码"
+          :rules="[{ required: true, message: '请再次填写密码' }]"
+      />
     </van-cell-group>
     <div style="margin: 16px;">
       <van-button round block type="primary" native-type="submit">
-        提交
+        注册
       </van-button>
-      <p>还有没账号？<a style="color: blue" @click="router.push('/register')">点击注册</a></p>
     </div>
   </van-form>
-
 </template>
-<script setup lang="ts">
-import {useRoute, useRouter} from "vue-router";
-import {ref} from "vue";
+<script setup>
+import {ref,} from 'vue';
 import MyAxios from "../plugins/myAxios";
 
-
-const router = useRouter()
-const route = useRoute()
-const userAccount = ref('');
-const userPassword = ref('');
+const userAccount = ref('')
+const userPassword = ref('')
+const checkPassword = ref('')
 const onSubmit = async () => {
-  const res = await MyAxios.post('/user/login', {
+  const res = await MyAxios.post('/user/register', {
     userAccount: userAccount.value,
-    userPassword: userPassword.value
+    userPassword: userPassword.value,
+    checkPassword: checkPassword.value
   })
   if (res.code === 0 && res.data) {
-    showToast('登录成功')
-    const redirectUrl = route.query?.redirect as string ?? '/';
-    window.location.href = redirectUrl
-    // router.replace('/');
+    showToast('注册成功')
+    window.location.href = '/login'
   } else {
-    showToast('登录失败')
+    showToast('注册失败')
   }
-};
+}
+
 </script>
+
 <style scoped>
 
 </style>

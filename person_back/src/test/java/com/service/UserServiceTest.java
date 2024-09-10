@@ -27,10 +27,10 @@ class UserServiceTest {
     public void testSave() {
         User user = new User();
         user.setUsername("lack");
-        user.setUserAccount("lack");
-        user.setAvatarUrl("https://static.res.qq.com/wupload/xy/pcdaohang/byRVXZiw.png");
+        user.setUserAccount("Admin");
+        user.setAvatarUrl("https://tse4-mm.cn.bing.net/th/id/OIP-C.iRiByjV7_bbOeDD14iInEwHaEo?w=291&h=182&c=7&r=0&o=5&dpr=1.3&pid=1.7");
         user.setGender(0);
-        user.setUserPassword("123456");
+        user.setUserPassword("12345678");
         user.setPhone("123456789");
         user.setEmail("123456789");
         user.setUserStatus(0);
@@ -85,7 +85,7 @@ class UserServiceTest {
             user.setUserRole(0);
             user.setPlanetCode("12345" + ACCOUNT_NUM);
             user.setTags("");
-            user.setProfile("");
+//            user.setProfile("");
             userList.add(user);
             userMapper.insert(user);
         }

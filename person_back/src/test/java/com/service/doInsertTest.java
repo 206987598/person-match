@@ -58,8 +58,8 @@ class doInsertTest {
                 user.setIsDelete(0);
                 user.setUserRole(0);
                 user.setPlanetCode("12345");
-                user.setTags("");
-                user.setProfile("");
+                user.setTags("['java','c++','男','大一']");
+//                user.setProfile("");
                 // 将用户对象添加到列表中
                 userList.add(user);
                 // 检查是否达到批次处理数量，达到则提交当前批次

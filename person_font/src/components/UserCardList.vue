@@ -1,7 +1,6 @@
 <template>
   <van-card v-for="user in props.userList"
             :title="user.username"
-            :desc="user.profile"
             :thumb="user.avatarUrl"
   >
     <template #tags>

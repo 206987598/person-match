@@ -46,16 +46,6 @@ router.beforeEach((to) => {
   // 设置页面标题为找到的路由配置中的title，如果没有则使用默认标题
   title.value = route?.title ?? DEFAULT_TITLE
 })
-
-router.beforeEach((to) => {
-  const toPath = to.path;
-  const route = routes.find((route) => {
-    return route.path === toPath;
-  })
-  title.value = route?.title ?? DEFAULT_TITLE
-})
-
-
 const onClickLeft = () => {
   router.back()
   // router.push(('/'))

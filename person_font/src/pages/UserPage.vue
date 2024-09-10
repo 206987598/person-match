@@ -35,7 +35,7 @@ const Router = useRouter()
  * @param {string} currentValue - 当前编辑字段的值
  * 路由跳转到编辑页面，并传递编辑信息作为查询参数
  */
-const logOut = async () => {
+const logOut =  async () => {
   const res = await MyAxios.post("/user/logout");
   if (res.code === 0){
     Router.replace("/login");
